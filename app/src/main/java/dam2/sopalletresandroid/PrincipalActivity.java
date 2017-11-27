@@ -63,9 +63,23 @@ public class PrincipalActivity extends AppCompatActivity {
                 Log.i("info", "reset");
 
                 for(Integer item : letrasMarcadas){
-
-
+                    //System.out.println(item);
+                    System.out.println();
+                    gvTauler.getChildAt(item).setBackgroundColor(getResources().getColor(android.R.color.transparent));
                 }
+
+               /* final int size = gvTauler.getChildCount();
+                for(int i = 0; i < size; i++) {
+                    ViewGroup gridChild = (ViewGroup) mGridView.getChildAt(i);
+                    int childSize = gridChild.getChildCount();
+                    for(int k = 0; k < childSize; k++) {
+                        if( gridChild.getChildAt(k) instanceof TextView ) {
+                            gridChild.getChildAt(k).setVisibility(View.GONE);
+                        }
+                    }
+                }*/
+
+
 
             }
         });
