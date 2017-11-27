@@ -1,0 +1,15 @@
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+    <!-- Cerca, apareix com un boto -->
+    <item android:id="@+id/main"
+        android:icon="@drawable/ic_apps_black_24dp"
+        android:title="@string/main"
+        android:showAsAction="ifRoom"
+        tools:ignore="AppCompatResource" />
+
+    <item android:id="@+id/principal"
+        android:title="@string/principal"
+        android:showAsAction="never"
+        tools:ignore="AppCompatResource" />
+
+</menu>
