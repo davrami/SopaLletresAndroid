@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -48,6 +49,7 @@ public class PrincipalActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String missatge = intent.getStringExtra(MainActivity.EXTRA_MISSATGE); // get data inside intent last view
         Log.i("info", missatge);
+
         //tauler
         gvTauler = (GridView) findViewById(R.id.gvTauler);
         final ArrayList<Integer> letrasMarcadas = new ArrayList<>();
@@ -68,8 +70,6 @@ public class PrincipalActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Log.i("info", "reset");
                 for(Integer item : letrasMarcadas ){
-                    //System.out.println(item);
-                    System.out.println();
                     gvTauler.getChildAt(item).setBackgroundColor(getResources().getColor(android.R.color.transparent));
                 }
                 letrasMarcadas.clear();
@@ -81,14 +81,18 @@ public class PrincipalActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.i("info", parent.toString()+ view+ position+id  );
-                Log.i("info", view.toString()  );
-                Log.i("info", String.valueOf(position));
-                Log.i("info", String.valueOf(id ) );
-                System.out.println( abc[position]);
-
+                Log.i("infoView", view.toString()  );
+                Log.i("infoPosition", String.valueOf(position));
+                Log.i("infoId", parent.getItemAtPosition(position).toString() );
+                //Log.i("infoId", String.valueOf(id ) );
+                //System.out.println( abc[position]);
 
                 letrasMarcadas.add(position);
                 view.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+                if (comprovaParaula(parent, letrasMarcadas)){
+                    btReset.callOnClick();
+                }
+
             }
         });
     }
@@ -98,9 +102,6 @@ public class PrincipalActivity extends AppCompatActivity {
     public void generateGridTauler() {
         buttonGoMain.setVisibility(View.GONE); // hide button generate
         String[] array = generaArrayLLetres();
-          for (String arrayMot : array) {
-            System.out.println(arrayMot.toString());
-        }
         Adapter = new ArrayAdapter<String>(this,android.R.layout.simple_selectable_list_item, array);
         gvTauler.setAdapter(Adapter);
     }
@@ -109,14 +110,26 @@ public class PrincipalActivity extends AppCompatActivity {
 
         String result ="";
         int x = 0;
-        for (int i = 0 ; i < 99;i+=9 ){
+        for (int i = 0 ; i < 100;i+=9 ){
             String paraula = arrayMots[x];
-
             result = result.concat(paraula);
             x++;
         }
 
-        return result.split("");
+        return result.split("(?!^)");
     }
 
+    public Boolean comprovaParaula(AdapterView<?> parent, ArrayList<Integer> posicions){
+        String paraula = "";
+
+        for (Integer item : posicions ){
+            paraula += parent.getItemAtPosition(item).toString();
+        }
+
+        if (Arrays.asList(arrayMots).contains(paraula)){
+            System.out.println(paraula+" Existeix");
+            return true;
+        }else
+            return false;
+    }
 }

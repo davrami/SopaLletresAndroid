@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="mots">
-    <item>MESA</item>
-    <item>PC</item>
-    <item>PORTATIL</item>
-    <item>RATON</item>
-    <item>TECLADO</item>
-    <item>TESTING</item>
-    <item>EXAMEN</item>
-    <item>SUSPENSO</item>
-    <item>FALSE</item>
-    <item>NIL</item>
+        <item>MESA</item>
+        <item>PC</item>
+        <item>PORTATIL</item>
+        <item>RATON</item>
+        <item>TECLADO</item>
+        <item>TESTING</item>
+        <item>EXAMEN</item>
+        <item>SUSPENSO</item>
+        <item>FALSE</item>
+        <item>NIL</item>
         <item>MESA</item>
         <item>PC</item>
         <item>PORTATIL</item>
@@ -22,7 +22,6 @@
         <item>FALSE</item>
         <item>NIL</item>
     </string-array>
-
 </resources>
 
 
