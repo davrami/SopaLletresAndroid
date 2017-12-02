@@ -89,6 +89,13 @@ public class PrincipalActivity extends AppCompatActivity {
                     //System.out.println(item);
                     System.out.println();
                     gvTauler.getChildAt(item).setBackgroundColor(getResources().getColor(android.R.color.transparent));
+                    for (Paraula pc: paraulasCompletadas){
+                        for (Paraula.Lletra l : pc.lletres) {
+                            TextView tParaula = (TextView) gvTauler.getChildAt(l.getPosicion());
+                            tParaula.setTextColor(getResources().getColor(android.R.color.holo_red_light));
+                        }
+                    }
+
                 }
                 letrasMarcadas.clear();
             }
@@ -115,13 +122,16 @@ public class PrincipalActivity extends AppCompatActivity {
                         // TODO marcar la palabra de abajo
                         // Todo sumar puntos
                         Paraula p = paraulasCompletadas.get(paraulasCompletadas.size() - 1);
-                        gvParaules.getChildAt(p.getIndex()).setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
-
+                        TextView tParaula = (TextView) gvParaules.getChildAt(p.getIndex());
+                        tParaula.setTextColor(getResources().getColor(android.R.color.holo_red_light));
                         btReset.callOnClick();
+
+
+                        //suma puntos
+                        Utility.sumaPunts( p, paraulasCompletadas);
 
                     } else {
                         System.out.println("paraula No Completada");
-
                     }
                 /*if (comprovaParaula(parent, letrasMarcadas)){
                     btReset.callOnClick();

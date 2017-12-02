@@ -56,4 +56,12 @@ public abstract class  Utility {
          return result && count == posicionsMarcades.size();
      }
 
+    public static void sumaPunts(Paraula p, ArrayList<Paraula> paraulasCompletadas){
+        if(paraulasCompletadas.indexOf(p)>0){
+            System.out.println("no existe");
+        }
+
+
+    }
+
 }

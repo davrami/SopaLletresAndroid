@@ -2,5 +2,6 @@
     <string name="app_name">SopaLletresAndroid</string>
     <string name="main">Main</string>
     <string name="principal">Principal</string>
+    <string name="ajuda">Ajuda</string>
 
 </resources>
