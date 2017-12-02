@@ -98,8 +98,9 @@ public class PrincipalActivity extends AppCompatActivity {
     public GridView gvTauler; //grid lletres
     public String[] arrayMots; //llista paraules de xml
     public GridView gvParaules; //llista paraules
-    public String[][][] paraulesColocades ;
-    public ArrayList<Paraula> llistaParaules = new ArrayList<Paraula>();
+    public ArrayList<Paraula> llistaParaules;
+    public static ArrayList<Paraula> paraulasCompletadas;
+    public Integer puntuacion;
 
 
     public static ArrayList<Integer> letrasMarcadas;
@@ -116,12 +117,14 @@ public class PrincipalActivity extends AppCompatActivity {
         setContentView(R.layout.activity_principal);
         //tvText = (TextView) findViewById(R.id.tvPrincipal);
 
-        ArrayList<Paraula> llistaParaules = new ArrayList<Paraula>();
+        llistaParaules = new ArrayList<Paraula>();
+        paraulasCompletadas = new ArrayList<Paraula>();
+
         arrayMots = getResources().getStringArray(R.array.mots); //recupera de arrays.xml les paraules
-        for (String arrayMot : arrayMots) {
+
+        /*for (String arrayMot : arrayMots) {
             System.out.println(arrayMot.toString());
-        }
-        String[][][] paraulesColocades =  new String[20][20][20];
+        }*/
         Intent intent = getIntent();
         String missatge = intent.getStringExtra(MainActivity.EXTRA_MISSATGE); // get data inside intent last view
         Log.i("info", missatge);
@@ -148,6 +151,13 @@ public class PrincipalActivity extends AppCompatActivity {
                 Log.i("info", "reset");
                 for(Integer item : letrasMarcadas ){
                     gvTauler.getChildAt(item).setBackgroundColor(getResources().getColor(android.R.color.transparent));
+                    for (Paraula pc: paraulasCompletadas){
+                        for (Paraula.Lletra l : pc.lletres) {
+                            TextView tParaula = (TextView) gvTauler.getChildAt(l.getPosicion());
+                            tParaula.setTextColor(getResources().getColor(android.R.color.holo_red_light));
+                        }
+                    }
+
                 }
                 letrasMarcadas.clear();
             }
@@ -157,19 +167,38 @@ public class PrincipalActivity extends AppCompatActivity {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.i("info", parent.toString()+ view+ position+id  );
-                Log.i("infoView", view.toString()  );
-                Log.i("infoPosition", String.valueOf(position));
-                Log.i("infoId", parent.getItemAtPosition(position).toString() );
-                //Log.i("infoId", String.valueOf(id ) );
-                //System.out.println( abc[position]);
+                if(letrasMarcadas.indexOf(position) < 0) { //si no esta marcada previamente
+                    letrasMarcadas.add(position); //añadir a array de posiciones marcadas
 
-                letrasMarcadas.add(position);
-                view.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-                if (comprovaParaula(parent, letrasMarcadas)){
+                    //Log.i("info", parent.toString()+ view+ position+id  );
+                    //Log.i("infoView", view.toString()  );
+                    Log.i("infoPosition", String.valueOf(position));
+                    Log.i("infoId", parent.getItemAtPosition(position).toString());
+
+                    String result = Utility.comprovaPosicio(position, llistaParaules, letrasMarcadas);
+
+                    view.setBackgroundColor(getResources().getColor(android.R.color.tertiary_text_dark));
+
+                    if (result == "Completada") {
+                        System.out.println("paraula COMPLETADA");
+                        // TODO marcar la palabra de abajo
+                        // Todo sumar puntos
+                        Paraula p = paraulasCompletadas.get(paraulasCompletadas.size() - 1);
+                        TextView tParaula = (TextView) gvParaules.getChildAt(p.getIndex());
+                        tParaula.setTextColor(getResources().getColor(android.R.color.holo_red_light));
+                        btReset.callOnClick();
+
+
+                        //suma puntos
+                        Utility.sumaPunts( p, paraulasCompletadas);
+
+                    } else {
+                        System.out.println("paraula No Completada");
+                    }
+                /*if (comprovaParaula(parent, letrasMarcadas)){
                     btReset.callOnClick();
+                }*/
                 }
-
             }
         });
     }
@@ -187,7 +216,7 @@ public class PrincipalActivity extends AppCompatActivity {
 
         String result = "";
         int q = 0;
-        for (int i = 0; i <= 99 && q <= 9; i += 9) {
+        for (int i = 0; i <= 99 && q <= 9; i += 10) {
             String paraula = arrayMots[q];
             String fila = "";
 
@@ -201,16 +230,17 @@ public class PrincipalActivity extends AppCompatActivity {
             int limitH = 10 - (paraula.length() - 1);
             Random r = new Random();
             int rand = r.nextInt(limitH);
-            Paraula p = new Paraula(paraula);
+            System.out.println(rand);
+            Paraula p = new Paraula(paraula, q);
             llistaParaules.add(p);
 
             fila = fila.substring(0, rand) + paraula + fila.substring(rand + paraula.length());
 
             for (int z = 0; z < paraula.length(); z++) {
-                //System.out.println( "q"+q +" i"+i+" z"+z +" pos"+(limitH+z)+" paraula"+paraula+" sub"+paraula.substring(z,z+1));
+                //System.out.println( "q"+q +" i"+i+" z"+z +" rand"+rand+" limit"+(limitH)+" pos"+(limitH+z)+" paraula"+paraula+" sub"+paraula.substring(z,z+1)+" finalpos"+(limitH + z+ i+ rand -1));
                 Paraula.Lletra l = new Paraula.Lletra();
                 l.setString(paraula.substring(z, z + 1));
-                l.setPosicion(limitH + z+ i+ rand -1);
+                l.setPosicion(z+ i+ rand);
                 p.lletres.add(l);
             }
 
@@ -224,16 +254,15 @@ public class PrincipalActivity extends AppCompatActivity {
         ArrayAdapter<String> AdapterParaules = new ArrayAdapter<String>(this, android.R.layout.test_list_item, arrayMots);
         gvParaules.setAdapter(AdapterParaules);
 
+        //PRINT paraules lletres y sus posiciones
         for (Paraula pa : llistaParaules) {
             System.out.println(pa.getNom());
-
             for (Paraula.Lletra l : pa.lletres) {
                 System.out.println(l.getString() +" posición: "+l.getPosicion());
             }
         }
 
-        return result.split("(?!^)");
-
+        return result.split("(?!^)");//retorna un string concatenado de todas las letras
     }
 
 

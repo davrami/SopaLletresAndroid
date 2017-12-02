@@ -11,7 +11,9 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity  {
     protected static final String EXTRA_MISSATGE = "dam2.sopadelletresandroid";
     protected Button buttonGoPrincipal; //Declare button in view
 
@@ -85,8 +87,9 @@ public class MainActivity extends AppCompatActivity {
                 myWebView.loadUrl("http://www.ludoteka.com/sopa-de-letras.html");
                 break;
         }
-
     }
+
+
 
 
 }
