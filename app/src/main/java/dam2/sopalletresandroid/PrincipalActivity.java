@@ -169,6 +169,10 @@ public class PrincipalActivity extends AppCompatActivity {
                 /*if (comprovaParaula(parent, letrasMarcadas)){
                     btReset.callOnClick();
                 }*/
+                }else{
+                    view.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+                    System.out.println(position); //borrar a array de posiciones marcadas
+                    System.out.println( letrasMarcadas.remove(letrasMarcadas.indexOf(position)));
                 }
             }
         });
