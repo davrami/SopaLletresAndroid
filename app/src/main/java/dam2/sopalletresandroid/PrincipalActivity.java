@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Random;
 
 public class PrincipalActivity extends AppCompatActivity {
 
@@ -106,6 +107,7 @@ public class PrincipalActivity extends AppCompatActivity {
         gvTauler.setAdapter(Adapter);
     }
 
+    //test
     public String[] generaArrayLLetres(){
 
         String result ="";
@@ -117,6 +119,39 @@ public class PrincipalActivity extends AppCompatActivity {
         }
 
         return result.split("(?!^)");
+    }
+
+    //int randomNum = rand.nextInt((max - min) + 1) + min;
+
+    public String[] colocaLletra(String[] array, String paraula){
+        int n;
+        String cadena = "";
+        Random rnd = new Random();
+
+        n = rnd.nextInt((1 - 3) + 1) + 1;
+        switch (n){
+            //Horitzontal
+            case 1:
+                n = rnd.nextInt((0 - 99) + 1);
+                for (int x = 0;x<paraula.length();x++){
+                    if (n+paraula.length()%10<paraula.length() || array[n+x].length() != 0){
+                        array = colocaLletra(array, paraula);
+                    }else{
+                        for (x = 0;x<paraula.length();x++){
+                            array[x+n] = paraula.split("(?!^)")[x];
+                        }
+                    }
+                }
+                break;
+            //Vertical
+            case 2:
+                break;
+            //Diagonal
+            case 3:
+                break;
+        }
+
+        return array;
     }
 
     public Boolean comprovaParaula(AdapterView<?> parent, ArrayList<Integer> posicions){
