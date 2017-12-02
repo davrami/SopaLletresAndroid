@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
@@ -46,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.principal:
                 obrirActivity("principal");
                 return true;
+            case R.id.ajuda:
+                obrirActivity("ajuda");
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -70,6 +75,14 @@ public class MainActivity extends AppCompatActivity {
                 intentPrincipal.putExtra(EXTRA_MISSATGE, "go to principal");
                 startActivity(intentPrincipal);
 
+                break;
+
+            case "ajuda":
+                setContentView(R.layout.activity_help);
+                WebView myWebView = (WebView) findViewById(R.id.webviewAjuda);
+                WebSettings webSettings = myWebView.getSettings();
+                webSettings.setJavaScriptEnabled(true);
+                myWebView.loadUrl("http://www.ludoteka.com/sopa-de-letras.html");
                 break;
         }
 

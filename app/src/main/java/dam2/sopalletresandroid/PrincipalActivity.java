@@ -5,8 +5,12 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -28,6 +32,67 @@ import java.util.Random;
 
 public class PrincipalActivity extends AppCompatActivity {
 
+
+    ////OPTIONS MENU
+    protected static final String EXTRA_MISSATGE = "dam2.sopadelletresandroid";
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.action_bar_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.main:
+                obrirActivity("main");
+                return true;
+            case R.id.principal:
+                obrirActivity("principal");
+                return true;
+            case R.id.ajuda:
+                obrirActivity("ajuda");
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void obrirActivity(String view) {
+
+        Log.i("info", view);
+        String classe = "";
+
+        switch (view) {
+            case "main":
+                setContentView(R.layout.activity_main);
+                Intent intentMain = new Intent(this, MainActivity.class);
+                intentMain.putExtra(EXTRA_MISSATGE, "go to main");
+                startActivity(intentMain);
+
+                break;
+            case "principal":
+                setContentView(R.layout.activity_principal);
+                Intent intentPrincipal = new Intent(this, PrincipalActivity.class);
+                intentPrincipal.putExtra(EXTRA_MISSATGE, "go to principal");
+                startActivity(intentPrincipal);
+
+                break;
+
+            case "ajuda":
+                setContentView(R.layout.activity_help);
+                WebView myWebView = (WebView) findViewById(R.id.webviewAjuda);
+                WebSettings webSettings = myWebView.getSettings();
+                webSettings.setJavaScriptEnabled(true);
+                myWebView.loadUrl("http://www.ludoteka.com/sopa-de-letras.html");
+                break;
+        }
+
+    }
+
+    ///// MAIN PROGRAM
     public Button buttonGoMain;
     public Button btReset;
     public GridView gvTauler; //grid lletres
@@ -287,38 +352,6 @@ public class PrincipalActivity extends AppCompatActivity {
 
         return array;
     }
-
-
-        public String[] colocaLletra(String[] array, String paraula){
-            int n;
-            String cadena = "";
-            Random rnd = new Random();
-
-            n = rnd.nextInt((1 - 3) + 1) + 1;
-            switch (n){
-                //Horitzontal
-                case 1:
-                    n = rnd.nextInt((0 - 99) + 1);
-                    for (int x = 0;x<paraula.length();x++){
-                        if (n+paraula.length()%10<paraula.length() || array[n+x].length() != 0){
-                            array = colocaLletra(array, paraula);
-                        }else{
-                            for (x = 0;x<paraula.length();x++){
-                                array[x+n] = paraula.split("(?!^)")[x];
-                            }
-                        }
-                    }
-                    break;
-                //Vertical
-                case 2:
-                    break;
-                //Diagonal
-                case 3:
-                    break;
-            }
-
-            return array;
-        }
 
     //Comprova que la paraula existeixi dins l'array de respostes
     public Boolean comprovaParaula(AdapterView<?> parent, ArrayList<Integer> posicions){
