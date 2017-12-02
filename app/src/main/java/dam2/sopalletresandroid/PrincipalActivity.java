@@ -6,11 +6,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.GridView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.lang.reflect.Array;
@@ -26,13 +30,18 @@ public class PrincipalActivity extends AppCompatActivity {
 
     public Button buttonGoMain;
     public Button btReset;
-    public GridView gvTauler;
-    public String[] arrayMots;
+    public GridView gvTauler; //grid lletres
+    public String[] arrayMots; //llista paraules de xml
+    public GridView gvParaules; //llista paraules
+    public String[][][] paraulesColocades ;
+    public ArrayList<Paraula> llistaParaules = new ArrayList<Paraula>();
+
 
     public static ArrayList<Integer> letrasMarcadas;
     public String[] abc = new String[]{"A","B", "C", "D", "E","F", "G", "H", "I", "J","K", "L", "M", "N", "O",
             "P", "Q", "R", "S", "T","U", "V", "W", "X", "Y", "Z"};
-    ArrayAdapter<String> Adapter;
+    public ArrayAdapter<String> Adapter;
+    public ArrayAdapter<String> AdapterParaules;
 
     //private TextView tvText;
 
@@ -42,17 +51,19 @@ public class PrincipalActivity extends AppCompatActivity {
         setContentView(R.layout.activity_principal);
         //tvText = (TextView) findViewById(R.id.tvPrincipal);
 
-        arrayMots = getResources().getStringArray(R.array.mots);
-        /*for (String arrayMot : arrayMots) {
+        ArrayList<Paraula> llistaParaules = new ArrayList<Paraula>();
+        arrayMots = getResources().getStringArray(R.array.mots); //recupera de arrays.xml les paraules
+        for (String arrayMot : arrayMots) {
             System.out.println(arrayMot.toString());
-        }*/
-
+        }
+        String[][][] paraulesColocades =  new String[20][20][20];
         Intent intent = getIntent();
         String missatge = intent.getStringExtra(MainActivity.EXTRA_MISSATGE); // get data inside intent last view
         Log.i("info", missatge);
-
         //tauler
-        gvTauler = (GridView) findViewById(R.id.gvTauler);
+        gvTauler = (GridView) findViewById(R.id.gvTauler); //grid de lletres
+        gvParaules = (GridView) findViewById(R.id.gvParaules); //grid paraules
+
         final ArrayList<Integer> letrasMarcadas = new ArrayList<>();
         btReset = (Button) findViewById(R.id.btReset);
         buttonGoMain = (Button) findViewById(R.id.btGoMain);
@@ -103,23 +114,63 @@ public class PrincipalActivity extends AppCompatActivity {
     public void generateGridTauler() {
         buttonGoMain.setVisibility(View.GONE); // hide button generate
         String[] array = generaArrayLLetres();
-        Adapter = new ArrayAdapter<String>(this,android.R.layout.simple_selectable_list_item, array);
+        Adapter = new ArrayAdapter<String>(this,android.R.layout.test_list_item, array);
         gvTauler.setAdapter(Adapter);
     }
 
+    public String[] generaArrayLLetres() {
 
-    public String[] generaArrayLLetres(){
+        String result = "";
+        int q = 0;
+        for (int i = 0; i <= 99 && q <= 9; i += 9) {
+            String paraula = arrayMots[q];
+            String fila = "";
 
-        String result ="";
-        int x = 0;
-        for (int i = 0 ; i < 100;i+=9 ){
-            String paraula = arrayMots[x];
-            result = result.concat(paraula);
-            x++;
+            for (int l = 0; l < 10; l++) { //genera una fila de lletras random  = "kjfdshufdsdjas"
+                Random r = new Random();
+                int randLetra = r.nextInt(26);
+                fila = fila.concat(abc[randLetra]);
+            }
+
+            //decide donde puede colocarse la parabra y hace substring "asdMESAasdasd"
+            int limitH = 10 - (paraula.length() - 1);
+            Random r = new Random();
+            int rand = r.nextInt(limitH);
+            Paraula p = new Paraula(paraula);
+            llistaParaules.add(p);
+
+            fila = fila.substring(0, rand) + paraula + fila.substring(rand + paraula.length());
+
+            for (int z = 0; z < paraula.length(); z++) {
+                //System.out.println( "q"+q +" i"+i+" z"+z +" pos"+(limitH+z)+" paraula"+paraula+" sub"+paraula.substring(z,z+1));
+                Paraula.Lletra l = new Paraula.Lletra();
+                l.setString(paraula.substring(z, z + 1));
+                l.setPosicion(limitH + z+ i+ rand -1);
+                p.lletres.add(l);
+            }
+
+            result = result.concat(fila); //string resultant de concatenar lletres random y paraules
+            q++;
+
+
+        }
+        //GENERA lista paraules grid inferior
+        gvParaules = (GridView) findViewById(R.id.gvParaules);
+        ArrayAdapter<String> AdapterParaules = new ArrayAdapter<String>(this, android.R.layout.test_list_item, arrayMots);
+        gvParaules.setAdapter(AdapterParaules);
+
+        for (Paraula pa : llistaParaules) {
+            System.out.println(pa.getNom());
+
+            for (Paraula.Lletra l : pa.lletres) {
+                System.out.println(l.getString() +" posición: "+l.getPosicion());
+            }
         }
 
         return result.split("(?!^)");
+
     }
+
 
     //GENERA un array DIFERENTS POSICIONS
     public String[] generaArrayLLetres2(){
@@ -236,6 +287,38 @@ public class PrincipalActivity extends AppCompatActivity {
 
         return array;
     }
+
+
+        public String[] colocaLletra(String[] array, String paraula){
+            int n;
+            String cadena = "";
+            Random rnd = new Random();
+
+            n = rnd.nextInt((1 - 3) + 1) + 1;
+            switch (n){
+                //Horitzontal
+                case 1:
+                    n = rnd.nextInt((0 - 99) + 1);
+                    for (int x = 0;x<paraula.length();x++){
+                        if (n+paraula.length()%10<paraula.length() || array[n+x].length() != 0){
+                            array = colocaLletra(array, paraula);
+                        }else{
+                            for (x = 0;x<paraula.length();x++){
+                                array[x+n] = paraula.split("(?!^)")[x];
+                            }
+                        }
+                    }
+                    break;
+                //Vertical
+                case 2:
+                    break;
+                //Diagonal
+                case 3:
+                    break;
+            }
+
+            return array;
+        }
 
     //Comprova que la paraula existeixi dins l'array de respostes
     public Boolean comprovaParaula(AdapterView<?> parent, ArrayList<Integer> posicions){
