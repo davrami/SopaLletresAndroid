@@ -6,15 +6,26 @@ import java.util.ArrayList;
 //clase controladora de les paraules
 public class Paraula {
     String nom;
+    int index;
     public ArrayList<Lletra> lletres = new ArrayList<Lletra>();
 
     public String getNom() {
         return nom;
     }
 
-    public Paraula(String nom) {
+    public Paraula(String nom, int index) {
         super();
         this.nom = nom;
+        this.index = index;
+
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 
     public void setNom(String nom) {
