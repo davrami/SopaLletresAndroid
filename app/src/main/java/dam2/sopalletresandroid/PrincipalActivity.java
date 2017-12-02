@@ -107,7 +107,7 @@ public class PrincipalActivity extends AppCompatActivity {
         gvTauler.setAdapter(Adapter);
     }
 
-    //test
+
     public String[] generaArrayLLetres(){
 
         String result ="";
@@ -121,39 +121,123 @@ public class PrincipalActivity extends AppCompatActivity {
         return result.split("(?!^)");
     }
 
-    //int randomNum = rand.nextInt((max - min) + 1) + min;
+    //GENERA un array DIFERENTS POSICIONS
+    public String[] generaArrayLLetres2(){
 
-    public String[] colocaLletra(String[] array, String paraula){
-        int n;
-        String cadena = "";
+        String[] result = new String[100];
+        int x = 0;
+        for (int i = 0 ; i < 100;i+=20 ){
+            String paraula = arrayMots[x];
+            result = colocaLletra(result,paraula);
+            result = ompleForats(result);
+            x++;
+        }
+
+        for (int i = 0 ; i < 100;i++ ){
+            System.out.println(result[i]);
+        }
+
+        return result;
+    }
+
+    //OMPLE els espais en BLANC de l'array
+    public String[] ompleForats(String[] array){
+
         Random rnd = new Random();
 
-        n = rnd.nextInt((1 - 3) + 1) + 1;
+        for (int x = 0; x<array.length;x++){
+            if (array[x] == null ){
+                array[x] = Character.toString((char) (rnd.nextInt((90 - 65) + 1) + 65));
+            }
+        }
+
+        return array;
+    }
+
+    //COLOCA les paraules ALEATORIAMENT
+    public String[] colocaLletra(String[] array, String paraula){
+        //int randomNum = rand.nextInt((max - min) + 1) + min;
+        int n;
+        String cadena = "";
+        String[] fragments;
+        Random rnd = new Random();
+
+        n = rnd.nextInt((3 - 1) + 1) + 1;
+        Log.i("pos",""+n);
         switch (n){
-            //Horitzontal
+            //Horizontal
             case 1:
-                n = rnd.nextInt((0 - 99) + 1);
+                do {
+                    n = rnd.nextInt((99) + 1);
+                }while (n+paraula.length()>99);
+
+                System.out.println("La n-----------------------> "+n);
+                System.out.println("La paraula-----------------> "+paraula);
+
                 for (int x = 0;x<paraula.length();x++){
-                    if (n+paraula.length()%10<paraula.length() || array[n+x].length() != 0){
+                    if ((n+paraula.length())%10<paraula.length()){
                         array = colocaLletra(array, paraula);
+                        break;
                     }else{
-                        for (x = 0;x<paraula.length();x++){
-                            array[x+n] = paraula.split("(?!^)")[x];
-                        }
+                        System.out.println("La n-----------------------> Sí");
                     }
                 }
+                fragments = paraula.split("(?!^)");
+                for (int x = 0;x<paraula.length();x++){
+                    array[x+n] = fragments[x];
+                }
+
                 break;
             //Vertical
             case 2:
+                do {
+                    n = rnd.nextInt((99) + 1);
+                }while (n+(paraula.length()*10)>99);
+
+                System.out.println("La n-----------------------> "+n);
+                System.out.println("La paraula-----------------> "+paraula);
+
+                for (int x = 0;x<(paraula.length()*10);x+=10){
+                    if ((n+(paraula.length()*10))%10<paraula.length()){
+                        array = colocaLletra(array, paraula);
+                        break;
+                    }else{
+                        System.out.println("La n-----------------------> Sí");
+                    }
+                }
+                fragments = paraula.split("(?!^)");
+                for (int x = 0;x<(paraula.length()*10);x+=10){
+                    array[x+n] = fragments[x/10];
+                }
                 break;
             //Diagonal
             case 3:
+                do {
+                    n = rnd.nextInt((99) + 1);
+                }while (n+(paraula.length()*11)>99);
+
+                System.out.println("La n-----------------------> "+n);
+                System.out.println("La paraula-----------------> "+paraula);
+
+                for (int x = 0;x<(paraula.length()*11);x+=11){
+                    if ((n+(paraula.length()*11))%10<paraula.length()){
+                        array = colocaLletra(array, paraula);
+                        break;
+                    }else{
+                        System.out.println("La n-----------------------> Sí "+paraula);
+                    }
+                }
+                fragments = paraula.split("(?!^)");
+                for (int x = 0;x<(paraula.length()*11);x+=11){
+                    array[x+n] = fragments[x/11];
+                }
                 break;
         }
 
         return array;
     }
 
+    //Comprova que la paraula existeixi dins l'array de respostes
     public Boolean comprovaParaula(AdapterView<?> parent, ArrayList<Integer> posicions){
         String paraula = "";
 
