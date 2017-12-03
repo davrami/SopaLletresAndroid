@@ -12,8 +12,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -37,6 +41,67 @@ import java.util.Random;
 
 public class PrincipalActivity extends AppCompatActivity {
 
+
+    ////OPTIONS MENU
+    protected static final String EXTRA_MISSATGE = "dam2.sopadelletresandroid";
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.action_bar_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.main:
+                obrirActivity("main");
+                return true;
+            case R.id.principal:
+                obrirActivity("principal");
+                return true;
+            case R.id.ajuda:
+                obrirActivity("ajuda");
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void obrirActivity(String view) {
+
+        Log.i("info", view);
+        String classe = "";
+
+        switch (view) {
+            case "main":
+                setContentView(R.layout.activity_main);
+                Intent intentMain = new Intent(this, MainActivity.class);
+                intentMain.putExtra(EXTRA_MISSATGE, "go to main");
+                startActivity(intentMain);
+
+                break;
+            case "principal":
+                setContentView(R.layout.activity_principal);
+                Intent intentPrincipal = new Intent(this, PrincipalActivity.class);
+                intentPrincipal.putExtra(EXTRA_MISSATGE, "go to principal");
+                startActivity(intentPrincipal);
+
+                break;
+
+            case "ajuda":
+                setContentView(R.layout.activity_help);
+                WebView myWebView = (WebView) findViewById(R.id.webviewAjuda);
+                WebSettings webSettings = myWebView.getSettings();
+                webSettings.setJavaScriptEnabled(true);
+                myWebView.loadUrl("http://www.ludoteka.com/sopa-de-letras.html");
+                break;
+        }
+
+    }
+
+    ///// MAIN PROGRAM
     public Button buttonGoMain;
     public Button btReset;
     public GridView gvTauler; //grid lletres
@@ -74,8 +139,7 @@ public class PrincipalActivity extends AppCompatActivity {
             for (String nom : nomsContactes){
                 if(mots.size() < 10){
                     System.out.println("CONTACT");
-
-                    mots.add(nom);
+                    mots.add(nom.split(" ")[0]); // comentar esta linea si solo quieres palabras de xml
                 }
             }
         }
@@ -83,7 +147,6 @@ public class PrincipalActivity extends AppCompatActivity {
             for (String p : paraulesXML){
                 if(mots.size()  < 10){
                     System.out.println("XML");
-
                     mots.add(p);
                 }
             }
@@ -106,9 +169,9 @@ public class PrincipalActivity extends AppCompatActivity {
         final ArrayList<Integer> letrasMarcadas = new ArrayList<>();
         btReset = (Button) findViewById(R.id.btReset);
         buttonGoMain = (Button) findViewById(R.id.btGoMain);
-
-
         buttonGoMain.setOnClickListener(new View.OnClickListener() {
+
+
             @Override
             public void onClick(View v) {
                 Log.i("info", "generating...");
@@ -117,6 +180,7 @@ public class PrincipalActivity extends AppCompatActivity {
         });
 
         btReset.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
                 Log.i("info", "reset");
@@ -136,6 +200,7 @@ public class PrincipalActivity extends AppCompatActivity {
         });
 
         gvTauler.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(letrasMarcadas.indexOf(position) < 0) { //si no esta marcada previamente
@@ -242,37 +307,123 @@ public class PrincipalActivity extends AppCompatActivity {
 
     //int randomNum = rand.nextInt((max - min) + 1) + min;
 
-    public String[] colocaLletra(String[] array, String paraula){
-        int n;
-        String cadena = "";
+    //GENERA un array DIFERENTS POSICIONS
+    public String[] generaArrayLLetres2(){
+
+        String[] result = new String[100];
+        int x = 0;
+        for (int i = 0 ; i < 100;i+=20 ){
+            String paraula = arrayMots[x];
+            result = colocaLletra(result,paraula);
+            result = ompleForats(result);
+            x++;
+        }
+
+        for (int i = 0 ; i < 100;i++ ){
+            System.out.println(result[i]);
+        }
+
+        return result;
+    }
+
+    //OMPLE els espais en BLANC de l'array
+    public String[] ompleForats(String[] array){
+
         Random rnd = new Random();
 
-        n = rnd.nextInt((1 - 3) + 1) + 1;
+        for (int x = 0; x<array.length;x++){
+            if (array[x] == null ){
+                array[x] = Character.toString((char) (rnd.nextInt((90 - 65) + 1) + 65));
+            }
+        }
+
+        return array;
+    }
+
+    //COLOCA les paraules ALEATORIAMENT
+    public String[] colocaLletra(String[] array, String paraula){
+        //int randomNum = rand.nextInt((max - min) + 1) + min;
+        int n;
+        String cadena = "";
+        String[] fragments;
+        Random rnd = new Random();
+
+        n = rnd.nextInt((3 - 1) + 1) + 1;
+        Log.i("pos",""+n);
         switch (n){
-            //Horitzontal
+            //Horizontal
             case 1:
-                n = rnd.nextInt((0 - 99) + 1);
+                do {
+                    n = rnd.nextInt((99) + 1);
+                }while (n+paraula.length()>99);
+
+                System.out.println("La n-----------------------> "+n);
+                System.out.println("La paraula-----------------> "+paraula);
+
                 for (int x = 0;x<paraula.length();x++){
-                    if (n+paraula.length()%10<paraula.length() || array[n+x].length() != 0){
+                    if ((n+paraula.length())%10<paraula.length() && array[n+x].length() != 0){
                         array = colocaLletra(array, paraula);
+                        break;
                     }else{
-                        for (x = 0;x<paraula.length();x++){
-                            array[x+n] = paraula.split("(?!^)")[x];
-                        }
+                        System.out.println("La n-----------------------> Sí");
                     }
                 }
+                fragments = paraula.split("(?!^)");
+                for (int x = 0;x<paraula.length();x++){
+                    array[x+n] = fragments[x];
+                }
+
                 break;
             //Vertical
             case 2:
+                do {
+                    n = rnd.nextInt((99) + 1);
+                }while (n+(paraula.length()*10)>99);
+
+                System.out.println("La n-----------------------> "+n);
+                System.out.println("La paraula-----------------> "+paraula);
+
+                for (int x = 0;x<(paraula.length()*10);x+=10){
+                    if ((n+(paraula.length()*10))%10<paraula.length()){
+                        array = colocaLletra(array, paraula);
+                        break;
+                    }else{
+                        System.out.println("La n-----------------------> Sí");
+                    }
+                }
+                fragments = paraula.split("(?!^)");
+                for (int x = 0;x<(paraula.length()*10);x+=10){
+                    array[x+n] = fragments[x/10];
+                }
                 break;
             //Diagonal
             case 3:
+                do {
+                    n = rnd.nextInt((99) + 1);
+                }while (n+(paraula.length()*11)>99);
+
+                System.out.println("La n-----------------------> "+n);
+                System.out.println("La paraula-----------------> "+paraula);
+
+                for (int x = 0;x<(paraula.length()*11);x+=11){
+                    if ((n+(paraula.length()*11))%10<paraula.length()){
+                        array = colocaLletra(array, paraula);
+                        break;
+                    }else{
+                        System.out.println("La n-----------------------> Sí "+paraula);
+                    }
+                }
+                fragments = paraula.split("(?!^)");
+                for (int x = 0;x<(paraula.length()*11);x+=11){
+                    array[x+n] = fragments[x/11];
+                }
                 break;
         }
 
         return array;
     }
 
+    //Comprova que la paraula existeixi dins l'array de respostes
     public Boolean comprovaParaula(AdapterView<?> parent, ArrayList<Integer> posicions){
         String paraula = "";
 
