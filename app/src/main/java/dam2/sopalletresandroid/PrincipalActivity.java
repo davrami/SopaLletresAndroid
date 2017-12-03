@@ -1,7 +1,14 @@
 package dam2.sopalletresandroid;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +27,7 @@ import android.widget.GridView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -29,6 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
+
 
 public class PrincipalActivity extends AppCompatActivity {
 
@@ -97,38 +106,65 @@ public class PrincipalActivity extends AppCompatActivity {
     public Button btReset;
     public GridView gvTauler; //grid lletres
     public String[] arrayMots; //llista paraules de xml
+    public ArrayList<String> mots;
+
     public GridView gvParaules; //llista paraules
     public ArrayList<Paraula> llistaParaules;
     public static ArrayList<Paraula> paraulasCompletadas;
+    public ArrayList<String> nomsContactes;
+
     public Integer puntuacion;
-
-
     public static ArrayList<Integer> letrasMarcadas;
     public String[] abc = new String[]{"A","B", "C", "D", "E","F", "G", "H", "I", "J","K", "L", "M", "N", "O",
             "P", "Q", "R", "S", "T","U", "V", "W", "X", "Y", "Z"};
     public ArrayAdapter<String> Adapter;
-    public ArrayAdapter<String> AdapterParaules;
+    //public ArrayAdapter<String> AdapterParaules;
 
-    //private TextView tvText;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_principal);
-        //tvText = (TextView) findViewById(R.id.tvPrincipal);
+        String [] paraulesXML = getResources().getStringArray(R.array.mots); //recupera de arrays.xml les paraules
+        nomsContactes = new ArrayList<String>();
+        obtenirContactes(); //obtiene nombres contactos
 
         llistaParaules = new ArrayList<Paraula>();
         paraulasCompletadas = new ArrayList<Paraula>();
 
-        arrayMots = getResources().getStringArray(R.array.mots); //recupera de arrays.xml les paraules
+        mots = new ArrayList<String>();//lista de paraulas (contactos + xml)
+        //introduce los nombres contactos como palabras para la sopa de letras
 
+        if(nomsContactes.size() > 0){
+            for (String nom : nomsContactes){
+                if(mots.size() < 10){
+                    System.out.println("CONTACT");
+
+                    mots.add(nom);
+                }
+            }
+        }
+        if(mots.size()<10){ //si no hay suficientes nombres mete palabras del xml
+            for (String p : paraulesXML){
+                if(mots.size()  < 10){
+                    System.out.println("XML");
+
+                    mots.add(p);
+                }
+            }
+        }
+
+        int i = 0;
         /*for (String arrayMot : arrayMots) {
-            System.out.println(arrayMot.toString());
+            System.out.println(arrayMot.toString()+i);
+            i++;
         }*/
+
         Intent intent = getIntent();
         String missatge = intent.getStringExtra(MainActivity.EXTRA_MISSATGE); // get data inside intent last view
         Log.i("info", missatge);
-        //tauler
+
+        //tauler sopa lletras
         gvTauler = (GridView) findViewById(R.id.gvTauler); //grid de lletres
         gvParaules = (GridView) findViewById(R.id.gvParaules); //grid paraules
 
@@ -136,6 +172,7 @@ public class PrincipalActivity extends AppCompatActivity {
         btReset = (Button) findViewById(R.id.btReset);
         buttonGoMain = (Button) findViewById(R.id.btGoMain);
         buttonGoMain.setOnClickListener(new View.OnClickListener() {
+
 
             @Override
             public void onClick(View v) {
@@ -150,6 +187,8 @@ public class PrincipalActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Log.i("info", "reset");
                 for(Integer item : letrasMarcadas ){
+                    //System.out.println(item);
+                    System.out.println();
                     gvTauler.getChildAt(item).setBackgroundColor(getResources().getColor(android.R.color.transparent));
                     for (Paraula pc: paraulasCompletadas){
                         for (Paraula.Lletra l : pc.lletres) {
@@ -188,9 +227,11 @@ public class PrincipalActivity extends AppCompatActivity {
                         tParaula.setTextColor(getResources().getColor(android.R.color.holo_red_light));
                         btReset.callOnClick();
 
-
-                        //suma puntos
+                        // Todo sumar puntos
                         Utility.sumaPunts( p, paraulasCompletadas);
+
+                        Toast toast = Toast.makeText(getApplicationContext(), "Bien Hecho!", Toast.LENGTH_SHORT);
+                        toast.show();
 
                     } else {
                         System.out.println("paraula No Completada");
@@ -198,6 +239,10 @@ public class PrincipalActivity extends AppCompatActivity {
                 /*if (comprovaParaula(parent, letrasMarcadas)){
                     btReset.callOnClick();
                 }*/
+                }else{
+                    view.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+                    System.out.println(position); //borrar a array de posiciones marcadas
+                    System.out.println( letrasMarcadas.remove(letrasMarcadas.indexOf(position)));
                 }
             }
         });
@@ -210,6 +255,7 @@ public class PrincipalActivity extends AppCompatActivity {
         String[] array = generaArrayLLetres();
         Adapter = new ArrayAdapter<String>(this,android.R.layout.test_list_item, array);
         gvTauler.setAdapter(Adapter);
+
     }
 
     public String[] generaArrayLLetres() {
@@ -217,7 +263,7 @@ public class PrincipalActivity extends AppCompatActivity {
         String result = "";
         int q = 0;
         for (int i = 0; i <= 99 && q <= 9; i += 10) {
-            String paraula = arrayMots[q];
+            String paraula = mots.get(q);
             String fila = "";
 
             for (int l = 0; l < 10; l++) { //genera una fila de lletras random  = "kjfdshufdsdjas"
@@ -249,9 +295,11 @@ public class PrincipalActivity extends AppCompatActivity {
 
 
         }
+
+
         //GENERA lista paraules grid inferior
         gvParaules = (GridView) findViewById(R.id.gvParaules);
-        ArrayAdapter<String> AdapterParaules = new ArrayAdapter<String>(this, android.R.layout.test_list_item, arrayMots);
+        ArrayAdapter<String> AdapterParaules = new ArrayAdapter<String>(this, android.R.layout.test_list_item, mots);
         gvParaules.setAdapter(AdapterParaules);
 
         //PRINT paraules lletres y sus posiciones
@@ -265,6 +313,7 @@ public class PrincipalActivity extends AppCompatActivity {
         return result.split("(?!^)");//retorna un string concatenado de todas las letras
     }
 
+    //int randomNum = rand.nextInt((max - min) + 1) + min;
 
     //GENERA un array DIFERENTS POSICIONS
     public String[] generaArrayLLetres2(){
@@ -320,7 +369,7 @@ public class PrincipalActivity extends AppCompatActivity {
                 System.out.println("La paraula-----------------> "+paraula);
 
                 for (int x = 0;x<paraula.length();x++){
-                    if ((n+paraula.length())%10<paraula.length()){
+                    if ((n+paraula.length())%10<paraula.length() && array[n+x].length() != 0){
                         array = colocaLletra(array, paraula);
                         break;
                     }else{
@@ -396,4 +445,22 @@ public class PrincipalActivity extends AppCompatActivity {
         }else
             return false;
     }
+
+
+    public void obtenirContactes() {
+        Cursor phones = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null,null,null, null);
+        System.out.println("asdasd");
+
+        while (phones.moveToNext())
+        {
+            String name=phones.getString(phones.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+           // Toast.makeText(getApplicationContext(),name, Toast.LENGTH_SHORT).show();
+            if(name != null && name.length()>1){
+                nomsContactes.add(name.toUpperCase());
+            }
+           //System.out.println(name.toUpperCase());
+        }
+        phones.close();
+    }
+
 }

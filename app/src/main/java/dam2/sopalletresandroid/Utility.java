@@ -1,5 +1,10 @@
 package dam2.sopalletresandroid;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+import android.provider.ContactsContract;
+
 import java.util.ArrayList;
 
 public abstract class  Utility {
@@ -60,8 +65,9 @@ public abstract class  Utility {
         if(paraulasCompletadas.indexOf(p)>0){
             System.out.println("no existe");
         }
-
-
     }
+
+
+
 
 }
