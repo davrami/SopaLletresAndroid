@@ -9,21 +9,36 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.GridView;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity {
     protected static final String EXTRA_MISSATGE = "dam2.sopadelletresandroid";
     protected Button buttonGoPrincipal; //Declare button in view
+    public GridView topListData;
+    public GridView topListPunts;
+    public ArrayAdapter<String> Adapter;
+    public JocDbHelper jDB = new JocDbHelper(this);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        topListPunts = (GridView) findViewById(R.id.topListPunts);
+        ArrayList punts = (ArrayList) jDB.getDataPuntuacio()[1];
+        topListData = (GridView) findViewById(R.id.topListData);
+        ArrayList datas = (ArrayList) jDB.getDataPuntuacio()[0];
+        Adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, datas);
+        topListData.setAdapter(Adapter);
+        topListPunts.setAdapter(new ArrayAdapter<Integer>(this, android.R.layout.simple_list_item_1, punts));
+
+
         buttonGoPrincipal = (Button) findViewById(R.id.btPrincipal); //Link button in view with event
-        buttonGoPrincipal.setOnClickListener( new View.OnClickListener(){
+        buttonGoPrincipal.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -38,7 +53,6 @@ public class MainActivity extends AppCompatActivity  {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.action_bar_menu, menu);
-
 
 
         return true;
@@ -87,12 +101,8 @@ public class MainActivity extends AppCompatActivity  {
                 WebView myWebView = (WebView) findViewById(R.id.webviewAjuda);
                 WebSettings webSettings = myWebView.getSettings();
                 webSettings.setJavaScriptEnabled(true);
-                myWebView.loadUrl("http://www.ludoteka.com/sopa-de-letras.html");
+                myWebView.loadUrl("file:///android_asset/Reglas del juego.html");
                 break;
         }
     }
-
-
-
-
 }

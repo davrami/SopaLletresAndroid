@@ -1,33 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="dam2.sopalletresandroid.PrincipalActivity">
 
     <LinearLayout
-        android:layout_width="395dp"
-        android:layout_height="587dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        tools:layout_editor_absoluteX="8dp"
         tools:layout_editor_absoluteY="8dp">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             tools:layout_editor_absoluteX="8dp"
             tools:layout_editor_absoluteY="8dp">
-
-            <TextView
-                android:id="@+id/tvPrincipal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="PRINCIPAL"
-                tools:layout_editor_absoluteX="46dp"
-                tools:layout_editor_absoluteY="45dp" />
 
             <Button
                 android:id="@+id/btGoMain"
@@ -37,19 +27,18 @@
 
             <GridView
                 android:id="@+id/gvTauler"
-                android:layout_width="374dp"
-                android:layout_height="290dp"
+                android:layout_width="wrap_content"
+                android:layout_height="333dp"
                 android:layout_margin="0dp"
                 android:layout_marginBottom="0dp"
                 android:layout_marginEnd="0dp"
                 android:layout_marginLeft="0dp"
                 android:layout_marginRight="0dp"
                 android:layout_marginStart="0dp"
-                android:layout_marginTop="0dp"
+                android:layout_marginTop="50dp"
                 android:columnWidth="0dp"
                 android:elevation="0dp"
                 android:fitsSystemWindows="false"
-                android:gravity="center"
                 android:horizontalSpacing="0dp"
                 android:minHeight="0dp"
                 android:numColumns="10"
@@ -74,17 +63,20 @@
             android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
             android:orientation="vertical"
             tools:layout_editor_absoluteX="0dp"
             tools:layout_editor_absoluteY="8dp">
 
             <GridView
                 android:id="@+id/gvParaules"
-                android:layout_width="match_parent"
-                android:layout_height="203dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
                 android:numColumns="auto_fit"
-                tools:layout_editor_absoluteX="8dp"
-                tools:layout_editor_absoluteY="8dp" />
+                tools:layout_editor_absoluteX="281dp"
+                tools:layout_editor_absoluteY="0dp" />
         </LinearLayout>
     </LinearLayout>
 
