@@ -1,0 +1,10 @@
+a, .ui-widget-header a, .ui-widget-content a, .ui-state-default a {
+    color: #33a;
+    text-decoration:none;
+}
+a:hover, .ui-widget-header a:hover, .ui-widget-content a:hover, .ui-state-default a:hover {
+    color: #33f;
+}
+div.ui-tooltip {
+    max-width: 600px;
+}

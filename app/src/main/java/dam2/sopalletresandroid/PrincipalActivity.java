@@ -97,7 +97,7 @@ public class PrincipalActivity extends AppCompatActivity {
                 WebView myWebView = (WebView) findViewById(R.id.webviewAjuda);
                 WebSettings webSettings = myWebView.getSettings();
                 webSettings.setJavaScriptEnabled(true);
-                myWebView.loadUrl("http://www.ludoteka.com/sopa-de-letras.html");
+                myWebView.loadUrl("file:///android_asset/Reglas del juego.html");
                 break;
         }
 
