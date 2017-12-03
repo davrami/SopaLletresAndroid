@@ -30,9 +30,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -107,6 +109,7 @@ public class PrincipalActivity extends AppCompatActivity {
     public GridView gvTauler; //grid lletres
     public String[] arrayMots; //llista paraules de xml
     public ArrayList<String> mots;
+    public ArrayList<String> llegenda;
 
     public GridView gvParaules; //llista paraules
     public ArrayList<Paraula> llistaParaules;
@@ -118,6 +121,9 @@ public class PrincipalActivity extends AppCompatActivity {
     public String[] abc = new String[]{"A","B", "C", "D", "E","F", "G", "H", "I", "J","K", "L", "M", "N", "O",
             "P", "Q", "R", "S", "T","U", "V", "W", "X", "Y", "Z"};
     public ArrayAdapter<String> Adapter;
+
+    JocDbHelper jDB;//SQL DATABASE
+    long idDatabase = 0;//Id_PARTIDA
     //public ArrayAdapter<String> AdapterParaules;
 
 
@@ -125,9 +131,17 @@ public class PrincipalActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_principal);
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.READ_CONTACTS},
+                100);
+
         String [] paraulesXML = getResources().getStringArray(R.array.mots); //recupera de arrays.xml les paraules
         nomsContactes = new ArrayList<String>();
-        obtenirContactes(); //obtiene nombres contactos
+
+        jDB = new JocDbHelper(this);//Obre acces a la base de dades SQL
+        idDatabase = jDB.insertPuntuacio(new SimpleDateFormat("yyy/MM/dd HH:mm:ss").format(new Date()), 0);
+
+        obtenirContactes(); //obtiene nombres contactos , se ejecuta en el overray de los permisos si estos están concedidos
 
         llistaParaules = new ArrayList<Paraula>();
         paraulasCompletadas = new ArrayList<Paraula>();
@@ -135,18 +149,22 @@ public class PrincipalActivity extends AppCompatActivity {
         mots = new ArrayList<String>();//lista de paraulas (contactos + xml)
         //introduce los nombres contactos como palabras para la sopa de letras
 
+        int sizeMots = 40; //Establim la cuantitat de noms que agafa
+
         if(nomsContactes.size() > 0){
             for (String nom : nomsContactes){
-                if(mots.size() < 10){
+                if(mots.size() < sizeMots && nom.split(" ")[0].length()<8){
+                    //Afegit l'split per evitar que agafi noms complets amb cognoms
+                    //Només n'agafa si són més curts de 8 caracters
                     System.out.println("CONTACT");
 
-                    mots.add(nom);
+                    mots.add(nom.split(" ")[0]);
                 }
             }
         }
-        if(mots.size()<10){ //si no hay suficientes nombres mete palabras del xml
+        if(mots.size()<sizeMots){ //si no hay suficientes nombres mete palabras del xml
             for (String p : paraulesXML){
-                if(mots.size()  < 10){
+                if(mots.size()  < sizeMots){
                     System.out.println("XML");
 
                     mots.add(p);
@@ -214,7 +232,7 @@ public class PrincipalActivity extends AppCompatActivity {
                     Log.i("infoPosition", String.valueOf(position));
                     Log.i("infoId", parent.getItemAtPosition(position).toString());
 
-                    String result = Utility.comprovaPosicio(position, llistaParaules, letrasMarcadas);
+                    String result = Utility.comprovaPosicio(position, llistaParaules, letrasMarcadas, jDB, (int)idDatabase);
 
                     view.setBackgroundColor(getResources().getColor(android.R.color.tertiary_text_dark));
 
@@ -252,8 +270,8 @@ public class PrincipalActivity extends AppCompatActivity {
     //GENERA el adapter y inserta en el gridview
     public void generateGridTauler() {
         buttonGoMain.setVisibility(View.GONE); // hide button generate
-        String[] array = generaArrayLLetres();
-        Adapter = new ArrayAdapter<String>(this,android.R.layout.test_list_item, array);
+        String[] array = generaArrayLLetres2();
+        Adapter = new ArrayAdapter<String>(this,R.layout.layout_sopa, array);
         gvTauler.setAdapter(Adapter);
 
     }
@@ -273,6 +291,7 @@ public class PrincipalActivity extends AppCompatActivity {
             }
 
             //decide donde puede colocarse la parabra y hace substring "asdMESAasdasd"
+            System.out.println("Mot------------->"+paraula);
             int limitH = 10 - (paraula.length() - 1);
             Random r = new Random();
             int rand = r.nextInt(limitH);
@@ -319,17 +338,28 @@ public class PrincipalActivity extends AppCompatActivity {
     public String[] generaArrayLLetres2(){
 
         String[] result = new String[100];
-        int x = 0;
-        for (int i = 0 ; i < 100;i+=20 ){
-            String paraula = arrayMots[x];
-            result = colocaLletra(result,paraula);
-            result = ompleForats(result);
+        int x = 0,pos;
+        Random rnd = new Random();
+        llegenda = new ArrayList<>();
+        for (int i = 0 ; i < 100;i+=10 ){
+            pos = rnd.nextInt(mots.size());
+            String paraula = mots.get(pos);
+            Paraula p = new Paraula(paraula, i/10);
+            llistaParaules.add(i/10, p);
+            result = colocaLletra(result,paraula,i/10);
+            llegenda.add(paraula);
             x++;
         }
+        result = ompleForats(result);
 
         for (int i = 0 ; i < 100;i++ ){
             System.out.println(result[i]);
         }
+
+        //GENERA lista paraules grid inferior
+        gvParaules = (GridView) findViewById(R.id.gvParaules);
+        ArrayAdapter<String> AdapterParaules = new ArrayAdapter<String>(this, R.layout.layout_centered, llegenda);
+        gvParaules.setAdapter(AdapterParaules);
 
         return result;
     }
@@ -349,84 +379,102 @@ public class PrincipalActivity extends AppCompatActivity {
     }
 
     //COLOCA les paraules ALEATORIAMENT
-    public String[] colocaLletra(String[] array, String paraula){
+    public String[] colocaLletra(String[] array, String paraula, int index){
         //int randomNum = rand.nextInt((max - min) + 1) + min;
-        int n;
+        int n, allargada;
         String cadena = "";
         String[] fragments;
         Random rnd = new Random();
+        boolean insert = false;
+        Paraula.Lletra l;
 
-        n = rnd.nextInt((3 - 1) + 1) + 1;
-        Log.i("pos",""+n);
-        switch (n){
-            //Horizontal
-            case 1:
-                do {
-                    n = rnd.nextInt((99) + 1);
-                }while (n+paraula.length()>99);
+        do {
+            n = rnd.nextInt((3 - 1) + 1) + 1;
+            allargada=paraula.length()-1;
+            Log.i("pos",""+n);
+            outerswitch:
+            switch (n){
+                //Horizontal
+                case 1:
+                    do {
+                        n = rnd.nextInt((99) + 1);
+                    }while ((n+allargada)>99);
 
-                System.out.println("La n-----------------------> "+n);
-                System.out.println("La paraula-----------------> "+paraula);
+                    System.out.println("La n-----------------------> "+n);
+                    System.out.println("La paraula-----------------> "+paraula);
 
-                for (int x = 0;x<paraula.length();x++){
-                    if ((n+paraula.length())%10<paraula.length() && array[n+x].length() != 0){
-                        array = colocaLletra(array, paraula);
-                        break;
-                    }else{
-                        System.out.println("La n-----------------------> Sí");
+                    for (int x = 0;x<paraula.length();x++){
+                        if ((n+x)%10==9 || array[n+x] != null){
+                            break outerswitch;
+                        }else{
+                            System.out.println("La n-----------------------> Sí");
+                        }
                     }
-                }
-                fragments = paraula.split("(?!^)");
-                for (int x = 0;x<paraula.length();x++){
-                    array[x+n] = fragments[x];
-                }
 
-                break;
-            //Vertical
-            case 2:
-                do {
-                    n = rnd.nextInt((99) + 1);
-                }while (n+(paraula.length()*10)>99);
-
-                System.out.println("La n-----------------------> "+n);
-                System.out.println("La paraula-----------------> "+paraula);
-
-                for (int x = 0;x<(paraula.length()*10);x+=10){
-                    if ((n+(paraula.length()*10))%10<paraula.length()){
-                        array = colocaLletra(array, paraula);
-                        break;
-                    }else{
-                        System.out.println("La n-----------------------> Sí");
+                    fragments = paraula.split("(?!^)");
+                    for (int x = 0;x<paraula.length();x++){
+                        l = new Paraula.Lletra();
+                        array[x+n] = fragments[x];
+                        l.setString(fragments[x]);
+                        l.setPosicion(x+n);
+                        llistaParaules.get(index).lletres.add(l);
                     }
-                }
-                fragments = paraula.split("(?!^)");
-                for (int x = 0;x<(paraula.length()*10);x+=10){
-                    array[x+n] = fragments[x/10];
-                }
-                break;
-            //Diagonal
-            case 3:
-                do {
-                    n = rnd.nextInt((99) + 1);
-                }while (n+(paraula.length()*11)>99);
+                    insert = true;
+                    break;
+                //Vertical
+                case 2:
+                    do {
+                        n = rnd.nextInt((99) + 1);
+                    }while (n+(allargada*10)>99);
 
-                System.out.println("La n-----------------------> "+n);
-                System.out.println("La paraula-----------------> "+paraula);
+                    System.out.println("La n-----------------------> "+n);
+                    System.out.println("La paraula-----------------> "+paraula);
 
-                for (int x = 0;x<(paraula.length()*11);x+=11){
-                    if ((n+(paraula.length()*11))%10<paraula.length()){
-                        array = colocaLletra(array, paraula);
-                        break;
-                    }else{
-                        System.out.println("La n-----------------------> Sí "+paraula);
+                    for (int x = 0;x<(paraula.length()*10);x+=10){
+                        if ((n+x)%10==9 || array[n+x] != null){
+                            break outerswitch;
+                        }else{
+                            System.out.println("La n-----------------------> Sí");
+                        }
                     }
-                }
-                fragments = paraula.split("(?!^)");
-                for (int x = 0;x<(paraula.length()*11);x+=11){
-                    array[x+n] = fragments[x/11];
-                }
-                break;
-        }
+                    fragments = paraula.split("(?!^)");
+                    for (int x = 0;x<paraula.length();x++){
+                        l = new Paraula.Lletra();
+                        array[(x*10)+n] = fragments[x];
+                        l.setString(fragments[x]);
+                        l.setPosicion((x*10)+n);
+                        llistaParaules.get(index).lletres.add(l);
+                    }
+                    insert = true;
+                    break;
+                //Diagonal
+                case 3:
+                    do {
+                        n = rnd.nextInt((99) + 1);
+                    }while (n+(allargada*11)>99);
+
+                    System.out.println("La n-----------------------> "+n);
+                    System.out.println("La paraula-----------------> "+paraula);
+
+                    for (int x = 0;x<(paraula.length()*11);x+=11){
+                        if ((n+x)%10==9 || array[n+x] != null){
+                            break outerswitch;
+                        }else{
+                            System.out.println("La n-----------------------> Sí "+paraula);
+                        }
+                    }
+                    fragments = paraula.split("(?!^)");
+                    for (int x = 0;x<paraula.length();x++){
+                        l = new Paraula.Lletra();
+                        array[n+(x*11)] = fragments[x];
+                        l.setString(fragments[x]);
+                        l.setPosicion(n+(x*11));
+                        llistaParaules.get(index).lletres.add(l);
+                    }
+                    insert = true;
+                    break;
+            }
+        }while (!insert);
 
         return array;
     }
@@ -446,6 +494,19 @@ public class PrincipalActivity extends AppCompatActivity {
             return false;
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults) {
+        //Code 100 es respecte a l'accés als contactes
+        if (requestCode == 100) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission is granted
+                obtenirContactes();
+            } else {
+                Toast.makeText(this, "Until you grant the permission, we canot display contactnames", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     public void obtenirContactes() {
         Cursor phones = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null,null,null, null);
