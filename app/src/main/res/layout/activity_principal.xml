@@ -7,10 +7,13 @@
     tools:context="dam2.sopalletresandroid.PrincipalActivity">
 
     <LinearLayout
+        android:id="@+id/linearLayout3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:orientation="vertical"
-        tools:layout_editor_absoluteY="8dp">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -23,7 +26,7 @@
                 android:id="@+id/btGoMain"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Generate!" />
+                android:text="@string/generar" />
 
             <GridView
                 android:id="@+id/gvTauler"
@@ -55,7 +58,7 @@
                 android:id="@+id/btReset"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Reset" />
+                android:text="@string/reset" />
 
         </LinearLayout>
 

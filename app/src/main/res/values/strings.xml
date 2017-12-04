@@ -4,4 +4,7 @@
     <string name="principal">Principal</string>
     <string name="ajuda">Ajuda</string>
     <string name="btMain">Principal</string>
+    <string name="TitlePuntuacio">Top Plays</string>
+    <string name="reset">reset</string>
+    <string name="generar">Generate!</string>
 </resources>
