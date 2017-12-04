@@ -15,7 +15,7 @@ import android.widget.GridView;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity {
     protected static final String EXTRA_MISSATGE = "dam2.sopadelletresandroid";
     protected Button buttonGoPrincipal; //Declare button in view
     public GridView topListData;
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity  {
 
 
         buttonGoPrincipal = (Button) findViewById(R.id.btPrincipal); //Link button in view with event
-        buttonGoPrincipal.setOnClickListener( new View.OnClickListener(){
+        buttonGoPrincipal.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity  {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.action_bar_menu, menu);
-
 
 
         return true;
@@ -106,8 +105,4 @@ public class MainActivity extends AppCompatActivity  {
                 break;
         }
     }
-
-
-
-
 }

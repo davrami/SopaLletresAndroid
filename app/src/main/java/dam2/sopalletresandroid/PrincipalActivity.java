@@ -135,7 +135,7 @@ public class PrincipalActivity extends AppCompatActivity {
                 new String[]{Manifest.permission.READ_CONTACTS},
                 100);
 
-        String [] paraulesXML = getResources().getStringArray(R.array.mots); //recupera de arrays.xml les paraules
+        String[] paraulesXML = getResources().getStringArray(R.array.mots); //recupera de arrays.xml les paraules
         nomsContactes = new ArrayList<String>();
 
         jDB = new JocDbHelper(this);//Obre acces a la base de dades SQL
@@ -151,9 +151,9 @@ public class PrincipalActivity extends AppCompatActivity {
 
         int sizeMots = 40; //Establim la cuantitat de noms que agafa
 
-        if(nomsContactes.size() > 0){
-            for (String nom : nomsContactes){
-                if(mots.size() < sizeMots && nom.split(" ")[0].length()<8){
+        if (nomsContactes.size() > 0) {
+            for (String nom : nomsContactes) {
+                if (mots.size() < sizeMots && nom.split(" ")[0].length() < 8) {
                     //Afegit l'split per evitar que agafi noms complets amb cognoms
                     //Només n'agafa si són més curts de 8 caracters
                     System.out.println("CONTACT");
@@ -162,9 +162,9 @@ public class PrincipalActivity extends AppCompatActivity {
                 }
             }
         }
-        if(mots.size()<sizeMots){ //si no hay suficientes nombres mete palabras del xml
-            for (String p : paraulesXML){
-                if(mots.size()  < sizeMots){
+        if (mots.size() < sizeMots) { //si no hay suficientes nombres mete palabras del xml
+            for (String p : paraulesXML) {
+                if (mots.size() < sizeMots) {
                     System.out.println("XML");
 
                     mots.add(p);
@@ -204,17 +204,16 @@ public class PrincipalActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.i("info", "reset");
-                for(Integer item : letrasMarcadas ){
+                for (Integer item : letrasMarcadas) {
                     //System.out.println(item);
                     System.out.println();
                     gvTauler.getChildAt(item).setBackgroundColor(getResources().getColor(android.R.color.transparent));
-                    for (Paraula pc: paraulasCompletadas){
+                    for (Paraula pc : paraulasCompletadas) {
                         for (Paraula.Lletra l : pc.lletres) {
                             TextView tParaula = (TextView) gvTauler.getChildAt(l.getPosicion());
                             tParaula.setTextColor(getResources().getColor(android.R.color.holo_red_light));
                         }
                     }
-
                 }
                 letrasMarcadas.clear();
             }
@@ -224,7 +223,7 @@ public class PrincipalActivity extends AppCompatActivity {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(letrasMarcadas.indexOf(position) < 0) { //si no esta marcada previamente
+                if (letrasMarcadas.indexOf(position) < 0) { //si no esta marcada previamente
                     letrasMarcadas.add(position); //añadir a array de posiciones marcadas
 
                     //Log.i("info", parent.toString()+ view+ position+id  );
@@ -232,7 +231,7 @@ public class PrincipalActivity extends AppCompatActivity {
                     Log.i("infoPosition", String.valueOf(position));
                     Log.i("infoId", parent.getItemAtPosition(position).toString());
 
-                    String result = Utility.comprovaPosicio(position, llistaParaules, letrasMarcadas, jDB, (int)idDatabase);
+                    String result = Utility.comprovaPosicio(position, llistaParaules, letrasMarcadas, jDB, (int) idDatabase);
 
                     view.setBackgroundColor(getResources().getColor(android.R.color.tertiary_text_dark));
 
@@ -246,9 +245,13 @@ public class PrincipalActivity extends AppCompatActivity {
                         btReset.callOnClick();
 
                         // Todo sumar puntos
-                        Utility.sumaPunts( p, paraulasCompletadas);
+                        Utility.sumaPunts(p, paraulasCompletadas, jDB, (int) idDatabase);
 
                         Toast toast = Toast.makeText(getApplicationContext(), "Bien Hecho!", Toast.LENGTH_SHORT);
+                        toast.show();
+                    } else if(result == "Completada"){
+                        System.out.println("repetida");
+                        Toast toast = Toast.makeText(getApplicationContext(), "Palabra ya resuelta...", Toast.LENGTH_SHORT);
                         toast.show();
 
                     } else {
@@ -260,7 +263,7 @@ public class PrincipalActivity extends AppCompatActivity {
                 }else{
                     view.setBackgroundColor(getResources().getColor(android.R.color.transparent));
                     System.out.println(position); //borrar a array de posiciones marcadas
-                    System.out.println( letrasMarcadas.remove(letrasMarcadas.indexOf(position)));
+                    System.out.println(letrasMarcadas.remove(letrasMarcadas.indexOf(position)));
                 }
             }
         });
@@ -271,7 +274,7 @@ public class PrincipalActivity extends AppCompatActivity {
     public void generateGridTauler() {
         buttonGoMain.setVisibility(View.GONE); // hide button generate
         String[] array = generaArrayLLetres2();
-        Adapter = new ArrayAdapter<String>(this,R.layout.layout_sopa, array);
+        Adapter = new ArrayAdapter<String>(this, R.layout.layout_sopa, array);
         gvTauler.setAdapter(Adapter);
 
     }
@@ -308,11 +311,8 @@ public class PrincipalActivity extends AppCompatActivity {
                 l.setPosicion(z+ i+ rand);
                 p.lletres.add(l);
             }
-
             result = result.concat(fila); //string resultant de concatenar lletres random y paraules
             q++;
-
-
         }
 
 
@@ -325,7 +325,7 @@ public class PrincipalActivity extends AppCompatActivity {
         for (Paraula pa : llistaParaules) {
             System.out.println(pa.getNom());
             for (Paraula.Lletra l : pa.lletres) {
-                System.out.println(l.getString() +" posición: "+l.getPosicion());
+                System.out.println(l.getString() + " posición: " + l.getPosicion());
             }
         }
 
@@ -390,33 +390,33 @@ public class PrincipalActivity extends AppCompatActivity {
 
         do {
             n = rnd.nextInt((3 - 1) + 1) + 1;
-            allargada=paraula.length()-1;
-            Log.i("pos",""+n);
+            allargada = paraula.length() - 1;
+            Log.i("pos", "" + n);
             outerswitch:
-            switch (n){
+            switch (n) {
                 //Horizontal
                 case 1:
                     do {
                         n = rnd.nextInt((99) + 1);
-                    }while ((n+allargada)>99);
+                    } while ((n + allargada) > 99);
 
-                    System.out.println("La n-----------------------> "+n);
-                    System.out.println("La paraula-----------------> "+paraula);
+                    System.out.println("La n-----------------------> " + n);
+                    System.out.println("La paraula-----------------> " + paraula);
 
-                    for (int x = 0;x<paraula.length();x++){
-                        if ((n+x)%10==9 || array[n+x] != null){
+                    for (int x = 0; x < paraula.length(); x++) {
+                        if ((n + x) % 10 == 9 || array[n + x] != null) {
                             break outerswitch;
-                        }else{
+                        } else {
                             System.out.println("La n-----------------------> Sí");
                         }
                     }
 
                     fragments = paraula.split("(?!^)");
-                    for (int x = 0;x<paraula.length();x++){
+                    for (int x = 0; x < paraula.length(); x++) {
                         l = new Paraula.Lletra();
-                        array[x+n] = fragments[x];
+                        array[x + n] = fragments[x];
                         l.setString(fragments[x]);
-                        l.setPosicion(x+n);
+                        l.setPosicion(x + n);
                         llistaParaules.get(index).lletres.add(l);
                     }
                     insert = true;
@@ -425,24 +425,24 @@ public class PrincipalActivity extends AppCompatActivity {
                 case 2:
                     do {
                         n = rnd.nextInt((99) + 1);
-                    }while (n+(allargada*10)>99);
+                    } while (n + (allargada * 10) > 99);
 
-                    System.out.println("La n-----------------------> "+n);
-                    System.out.println("La paraula-----------------> "+paraula);
+                    System.out.println("La n-----------------------> " + n);
+                    System.out.println("La paraula-----------------> " + paraula);
 
-                    for (int x = 0;x<(paraula.length()*10);x+=10){
-                        if ((n+x)%10==9 || array[n+x] != null){
+                    for (int x = 0; x < (paraula.length() * 10); x += 10) {
+                        if ((n + x) % 10 == 9 || array[n + x] != null) {
                             break outerswitch;
-                        }else{
+                        } else {
                             System.out.println("La n-----------------------> Sí");
                         }
                     }
                     fragments = paraula.split("(?!^)");
-                    for (int x = 0;x<paraula.length();x++){
+                    for (int x = 0; x < paraula.length(); x++) {
                         l = new Paraula.Lletra();
-                        array[(x*10)+n] = fragments[x];
+                        array[(x * 10) + n] = fragments[x];
                         l.setString(fragments[x]);
-                        l.setPosicion((x*10)+n);
+                        l.setPosicion((x * 10) + n);
                         llistaParaules.get(index).lletres.add(l);
                     }
                     insert = true;
@@ -451,30 +451,30 @@ public class PrincipalActivity extends AppCompatActivity {
                 case 3:
                     do {
                         n = rnd.nextInt((99) + 1);
-                    }while (n+(allargada*11)>99);
+                    } while (n + (allargada * 11) > 99);
 
-                    System.out.println("La n-----------------------> "+n);
-                    System.out.println("La paraula-----------------> "+paraula);
+                    System.out.println("La n-----------------------> " + n);
+                    System.out.println("La paraula-----------------> " + paraula);
 
-                    for (int x = 0;x<(paraula.length()*11);x+=11){
-                        if ((n+x)%10==9 || array[n+x] != null){
+                    for (int x = 0; x < (paraula.length() * 11); x += 11) {
+                        if ((n + x) % 10 == 9 || array[n + x] != null) {
                             break outerswitch;
-                        }else{
-                            System.out.println("La n-----------------------> Sí "+paraula);
+                        } else {
+                            System.out.println("La n-----------------------> Sí " + paraula);
                         }
                     }
                     fragments = paraula.split("(?!^)");
-                    for (int x = 0;x<paraula.length();x++){
+                    for (int x = 0; x < paraula.length(); x++) {
                         l = new Paraula.Lletra();
-                        array[n+(x*11)] = fragments[x];
+                        array[n + (x * 11)] = fragments[x];
                         l.setString(fragments[x]);
-                        l.setPosicion(n+(x*11));
+                        l.setPosicion(n + (x * 11));
                         llistaParaules.get(index).lletres.add(l);
                     }
                     insert = true;
                     break;
             }
-        }while (!insert);
+        } while (!insert);
 
         return array;
     }
@@ -509,14 +509,12 @@ public class PrincipalActivity extends AppCompatActivity {
     }
 
     public void obtenirContactes() {
-        Cursor phones = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null,null,null, null);
-        System.out.println("asdasd");
+        Cursor phones = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
 
-        while (phones.moveToNext())
-        {
-            String name=phones.getString(phones.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-           // Toast.makeText(getApplicationContext(),name, Toast.LENGTH_SHORT).show();
-            if(name != null && name.length()>1){
+        while (phones.moveToNext()) {
+            String name = phones.getString(phones.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+            // Toast.makeText(getApplicationContext(),name, Toast.LENGTH_SHORT).show();
+            if (name != null && name.length() > 1) {
                 nomsContactes.add(name.toUpperCase());
             }
            //System.out.println(name.toUpperCase());

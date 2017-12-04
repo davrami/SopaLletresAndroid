@@ -16,7 +16,6 @@ public abstract class  Utility {
      public static String comprovaPosicio(int posicio, ArrayList<Paraula> paraules, ArrayList<Integer> posicionsMarcades, JocDbHelper db, int id){
          boolean paraulaCompletada  = false;
          String result= "";
-
          for (int v : posicionsMarcades) {
              System.out.println("v"+ v);
          }
@@ -32,17 +31,18 @@ public abstract class  Utility {
                      result = "NoCompletada";
                      paraulaCompletada = comprovaParaulaCompletada(pa, posicionsMarcades);
                      if(paraulaCompletada) {
-                         PrincipalActivity.paraulasCompletadas.add(pa);
-                         db.updatePuntuacioSuma(id,new SimpleDateFormat("yyy/MM/dd HH:mm:ss").format(new Date()),10);
+
+                         if(PrincipalActivity.paraulasCompletadas.indexOf(pa) == -1){
+                             db.updatePuntuacioSuma(id,new SimpleDateFormat("yyy/MM/dd HH:mm:ss").format(new Date()),10);
+                             PrincipalActivity.paraulasCompletadas.add(pa);
+                             result="Completada";
+                         }else{
+                             result="repetida";
+                         }
+
                      }
                  }
              }
-         }
-         if(paraulaCompletada){
-             //System.out.println("paraula COMPLETADA");
-             result="Completada";
-         }else{
-             //System.out.println("paraula NO completada");
          }
          return result;
      }
@@ -67,10 +67,9 @@ public abstract class  Utility {
          return result && count == posicionsMarcades.size();
      }
 
-    public static void sumaPunts(Paraula p, ArrayList<Paraula> paraulasCompletadas){
-        if(paraulasCompletadas.indexOf(p)>0){
+    public static void sumaPunts(Paraula p, ArrayList<Paraula> paraulasCompletadas, JocDbHelper db, int id){
             System.out.println("no existe");
-        }
+            db.updatePuntuacioSuma(id,new SimpleDateFormat("yyy/MM/dd HH:mm:ss").format(new Date()),10);
     }
 
 
